@@ -13,7 +13,7 @@ logger.setLevel(logging.DEBUG)
 
 if __name__ == "__main__":
     bot.remove_webhook()
-    bot.set_webhook(url=APP_URL)
+    bot.set_webhook(url=APP_URL + BOT_TOKEN)
     server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
 order = Order()
@@ -31,7 +31,7 @@ def start(message):
     bot.send_message(message.chat.id, f'Здравствуйте, {message.from_user.username}!\nЯ бот для заказа эвакуатора или манипулятора.\nЦена подачи 2500руб, если вас устраивает цена, то давайте оформим заявку, выберите услугу', reply_markup=markup_inline)
 
 #перенаправление входящих сообщений с сервера фласк к боту
-@server.route(f"{APP_URL}{BOT_TOKEN}", methods=["POST"])
+@server.route(f"/{BOT_TOKEN}", methods=["POST"])
 def redirect_message():
     #получаем данные от сервера в json, декодируем и отправляем боту
     json_string = request.get_data().decode("utf-8")
