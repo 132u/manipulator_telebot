@@ -1,3 +1,2 @@
 pyTelegramBotAPI
 flask~=2.1.2
-telebot~=0.0.4
