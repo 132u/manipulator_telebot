@@ -112,4 +112,3 @@ def get_address_from_coords(coords):
         #если не смогли, то возвращаем ошибку
         return "error"
 
-bot.polling(none_stop=True)
