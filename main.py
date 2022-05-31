@@ -1,9 +1,21 @@
 
 import telebot
+import os
+import logging
+from config import *
 from telebot import types
+from flask import Flask, request
 from Order import Order, User
 
-bot = telebot.TeleBot('1286880904:AAHlGuDEPLN3lZO3gMCgdy9ArjVnQEvPBaA')
+bot = telebot.TeleBot(BOT_TOKEN)
+server = Flask(__name__)
+logger = telebot.logger
+logger.setLevel(logging.DEBUG)
+
+if __name__ == "__main__":
+    bot.remove_webhook()
+    bot.set_webhook(url=APP_URL)
+    server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 order = Order()
 user = User()
 order_message = ""
@@ -15,7 +27,17 @@ def start(message):
     item2 = types.InlineKeyboardButton(text='Заказать Манипулятор', callback_data='manipulator')
     markup_inline.add(item1, item2)
     # Здесь идет текст, который сопрождает кнопки, можно и без него
-    bot.send_message(message.chat.id, 'Здравствуйте!\nЯ бот для заказа эвакуатора или манипулятора.\nЦена подачи 2500руб, если вас устраивает цена, то давайте оформим заявку, выберите услугу', reply_markup=markup_inline)
+    bot.send_message(message.chat.id, f'Здравствуйте, {message.from_user.username}!\nЯ бот для заказа эвакуатора или манипулятора.\nЦена подачи 2500руб, если вас устраивает цена, то давайте оформим заявку, выберите услугу', reply_markup=markup_inline)
+
+#перенаправление входящих сообщений с сервера фласк к боту
+@server.route(f"/{BOT_TOKEN}", methods=["POST"])
+def redirect_message():
+    #получаем данные от сервера в json, декодируем и отправляем боту
+    json_string = request.get_data().decode("utf-8")
+    update = telebot.types.Update.de_json(json_string)
+    bot.process_new_updates([update])
+    return "!", 200
+
 
 @bot.callback_query_handler(func=lambda call:True)
 def callback(call):
